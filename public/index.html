@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>andopen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href='w3.css'>
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="icono.min.css">
+  <style>
+  body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
+  .w3-row-padding img {margin-bottom: 12px}
+  /* Set the width of the sidebar to 120px */
+  .w3-sidebar {width: 120px;background: #222;}
+  /* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
+  #main {margin-left: 120px}
+  /* Remove margins from "page content" on small screens */
+  @media only screen and (max-width: 600px) {#main {margin-left: 0}}
+  </style>
+
+
+
+</head>
+<!-- <body>
+  <ul class="pages">
+    <li class="chat page">
+      <div class="chatArea">
+        <ul class="messages"></ul>
+      </div>
+      <input class="inputMessage" placeholder="Type here..."/>
+    </li>
+    <li class="login page">
+      <div class="form">
+        <h3 class="title">What's your nickname?</h3>
+        <input class="usernameInput" type="text" maxlength="14" />
+      </div>
+    </li>
+  </ul>
+
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/main.js"></script>
+</body> -->
+
+
+
+<body class="w3-black">
+
+<!-- Icon Bar (Sidebar - hidden on small screens) -->
+<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+  <!-- Avatar image in top left corner -->
+  <!--<img src="/w3images/avatar_smoke.jpg" style="width:100%"> -->
+
+
+  <p>andopen</p>
+
+  <a href="#" class="w3-bar-item w3-button w3-padding-large w3-black">
+    <i class="icono-home"></i>
+    <p>HOME</p>
+  </a>
+  <a href="#enroll" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <!-- <i class="fa fa-user w3-xxlarge"></i> -->
+    <i class="icono-user"></i>
+    <p>ENROLL</p>
+  </a>
+  <a href="#identify" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <!-- <i class="fa fa-eye w3-xxlarge"></i> -->
+    <i class="icono-eye"></i>
+    <p>IDENTIFY</p>
+  </a>
+  <a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+    <!-- <i class="fa fa-envelope w3-xxlarge"></i> -->
+    <i class="icono-mail"></i>
+    <p>CONTACT</p>
+  </a>
+</nav>
+
+<!-- Navbar on small screens (Hidden on medium and large screens) -->
+<div class="w3-top w3-hide-large w3-hide-medium" id="myNavbar">
+  <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
+    <a href="#" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+    <a href="#enroll" class="w3-bar-item w3-button" style="width:25% !important">ENROLL</a>
+    <a href="#identify" class="w3-bar-item w3-button" style="width:25% !important">IDENTIFY</a>
+    <a href="#contact" class="w3-bar-item w3-button" style="width:25% !important">CONTACT</a>
+  </div>
+</div>
+
+<!-- Page Content -->
+<div class="w3-padding-large" id="main">
+
+
+
+  <!-- Header/Home -->
+  <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
+    <h1 class="w3-jumbo"><span class="w3-hide-small"></span> andopen</h1>
+    <p>Security Solutions.</p>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <!-- <img src="/forestbridge.jpg" alt="andopen" class="w3-image" width="992" height="1108"> -->
+  </header>
+
+  <!-- About Section -->
+
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="enroll">
+    <h2 class="w3-text-light-grey">Face Enroll</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <!-- <p>Lets get in touch. Send me a message:</p> -->
+
+    <!-- <form action="/action_page.php" target="_blank"> -->
+
+    <form id="faceenroll" action="">
+      <p><input id="faceid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
+      <p>
+        <button class="w3-button w3-light-grey w3-padding-large" type="submit">
+          <i class="fa fa-paper-plane"></i> Enroll
+        </button>
+        <button class="w3-button w3-light-grey w3-padding-large" type="button">
+          <i class="fa fa-paper-plane"></i> Cancel
+        </button>
+      </p>
+    </form>
+
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64">
+    <h2 class="w3-text-light-grey">Finger Enroll</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <!-- <p>Lets get in touch. Send me a message:</p> -->
+
+    <!-- <form action="/action_page.php" target="_blank"> -->
+
+    <form id="fingerenroll" action="">
+      <p><input id="fingerid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
+      <p>
+        <button class="w3-button w3-light-grey w3-padding-large" type="submit">
+          <i class="fa fa-paper-plane"></i> Enroll
+        </button>
+        <button class="w3-button w3-light-grey w3-padding-large" type="button">
+          <i class="fa fa-paper-plane"></i> Cancel
+        </button>
+      </p>
+    </form>
+
+
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="identify">
+    <h2 class="w3-text-light-grey">Identify</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <!-- Grid for photos -->
+    <div class="w3-row-padding" style="margin:0 -16px">
+      <div class="w3-half">
+        <p><img id="img2" width="100%"></p>
+        <!-- <ul id="messages"></ul> -->
+        <p><input id="messages2"></p>
+      </div>
+
+
+    <!-- End photo grid -->
+    </div>
+
+
+
+
+  <!-- End Portfolio Section -->
+  </div>
+
+  <!-- Contact Section -->
+  <div class="w3-padding-64 w3-content w3-text-grey" id="contact">
+    <h2 class="w3-text-light-grey">Contact</h2>
+    <hr style="width:200px" class="w3-opacity">
+
+    <div class="w3-section">
+      <!-- <p><i class="fa fa-map-marker fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Seoul, Republic of Korea</p>
+      <p><i class="fa fa-phone fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Phone: +82 10 5409 7001</p>
+      <p><i class="fa fa-envelope fa-fw w3-text-white w3-xxlarge w3-margin-right"> </i> Email: jayden@andopen.co.kr</p> -->
+      <p><i class="icono-tag"></i> Seoul, Republic of Korea</p>
+      <p><i class="icono-iphone"></i> Phone: +82 10 5409 7001</p>
+      <p><i class="icono-mail"> </i> Email: jayden@andopen.co.kr</p>
+    </div><br>
+    <!-- <p>Lets get in touch. Send me a message:</p> -->
+
+    <!-- <form action="/action_page.php" target="_blank">
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Name" required name="Name"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Email" required name="Email"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Subject" required name="Subject"></p>
+      <p><input class="w3-input w3-padding-16" type="text" placeholder="Message" required name="Message"></p>
+      <p>
+        <button class="w3-button w3-light-grey w3-padding-large" type="submit">
+          <i class="fa fa-paper-plane"></i> SEND MESSAGE
+        </button>
+      </p>
+    </form> -->
+  <!-- End Contact Section -->
+  </div>
+
+    <!-- Footer -->
+  <footer class="w3-content w3-padding-64 w3-text-grey w3-xlarge">
+    <i class="fa fa-facebook-official w3-hover-opacity"></i>
+    <i class="fa fa-instagram w3-hover-opacity"></i>
+    <i class="fa fa-snapchat w3-hover-opacity"></i>
+    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+    <i class="fa fa-twitter w3-hover-opacity"></i>
+    <i class="fa fa-linkedin w3-hover-opacity"></i>
+    <p class="w3-medium">Copyrights © 2018 All Rights Reserved by andopen  <a href="https://www.andopen.co.kr" target="_blank" class="w3-hover-text-green"></a></p>
+  <!-- End footer -->
+  </footer>
+
+<!-- END PAGE CONTENT -->
+</div>
+<!-- <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> -->
+<script src="/jquery-1.10.2.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/main.js"></script>
+<script>
+function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;i<r;i++){t+=String.fromCharCode(n[i])}return window.btoa(t)}
+  $(function () {
+    var socket = io();
+    // $('form').submit(function(){
+    //   socket.emit('chat message', $('#faceid').val());
+    //   $('#faceid').val('');
+    //   return false;
+    // });
+
+    $('#faceenroll').submit(function(){
+      socket.emit('faceenroll', $('#faceid').val());
+      $('#faceid').val('');
+      return false;
+    });
+
+    $('#fingerenroll').submit(function(){
+      socket.emit('fingerenroll', $('#fingerid').val());
+      $('#fingerid').val('');
+      return false;
+    });
+
+    // socket.on('chat message', function(msg){
+    //   $('#messages').append($('<li>').text(msg));
+    // });
+
+    socket.on('imageConversionByClient', function(data) {
+      $("#img2").attr("src","data:image/png;base64,"+b64(data.buffer));
+    });
+    socket.on('imageConversionByServer', function(data) {
+      $("#img2").attr("src",data);
+    });
+    socket.on('identifyLog', function(data) {
+      $('#messages2').val(data);
+    });
+  });
+</script>
+<script>
+  var socket = io();
+</script>
+</body>
+</html>
