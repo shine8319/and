@@ -19,7 +19,13 @@
   @media only screen and (max-width: 600px) {#main {margin-left: 0}}
   </style>
 
-
+  <style>
+  img {
+    width: 300px; height: 300px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  </style>
 
 </head>
 <!-- <body>
@@ -94,7 +100,7 @@
   <!-- Header/Home -->
   <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
     <h1 class="w3-jumbo"><span class="w3-hide-small"></span> andopen</h1>
-    <p>Security Solutions.</p>
+    <p>security solution provider</p>
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
     <!-- <img src="/forestbridge.jpg" alt="andopen" class="w3-image" width="992" height="1108"> -->
   </header>
@@ -102,7 +108,7 @@
   <!-- About Section -->
 
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="enroll">
-    <h2 class="w3-text-light-grey">Face Enroll</h2>
+    <h2 class="w3-text-light-grey">Face</h2>
     <hr style="width:200px" class="w3-opacity">
 
     <!-- <p>Lets get in touch. Send me a message:</p> -->
@@ -110,7 +116,9 @@
     <!-- <form action="/action_page.php" target="_blank"> -->
 
     <form id="faceenroll" action="">
+      <p><img id="enrollimg" width="100%"></p>
       <p><input id="faceid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
+      <p><input id="facename" class="w3-input w3-padding-16" type="text" placeholder="Name" required name="Name"></p>
       <p>
         <button class="w3-button w3-light-grey w3-padding-large" type="submit">
           <i class="fa fa-paper-plane"></i> Enroll
@@ -122,7 +130,7 @@
     </form>
 
   <div class="w3-content w3-justify w3-text-grey w3-padding-64">
-    <h2 class="w3-text-light-grey">Finger Enroll</h2>
+    <h2 class="w3-text-light-grey">Finger</h2>
     <hr style="width:200px" class="w3-opacity">
 
     <!-- <p>Lets get in touch. Send me a message:</p> -->
@@ -150,8 +158,9 @@
     <div class="w3-row-padding" style="margin:0 -16px">
       <div class="w3-half">
         <p><img id="img2" width="100%"></p>
+
         <!-- <ul id="messages"></ul> -->
-        <p><input id="messages2"></p>
+        <p><input id="messages2" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></p>
       </div>
 
 
@@ -222,8 +231,9 @@ function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;
     // });
 
     $('#faceenroll').submit(function(){
-      socket.emit('faceenroll', $('#faceid').val());
+      socket.emit('faceenroll', $('#faceid').val() + ";" + $('#facename').val() + ";");
       $('#faceid').val('');
+      $('#facename').val('');
       return false;
     });
 
@@ -242,6 +252,9 @@ function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;
     });
     socket.on('imageConversionByServer', function(data) {
       $("#img2").attr("src",data);
+    });
+    socket.on('enrollimg', function(data) {
+      $("#enrollimg").attr("src",data);
     });
     socket.on('identifyLog', function(data) {
       $('#messages2').val(data);

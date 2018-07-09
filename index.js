@@ -5,9 +5,116 @@ var path = require('path');
 var server = require('http').createServer(app);
 var fs = require('fs');
 var redis = require("redis")
-  , subscriber = redis.createClient()
-var io = require('../..')(server);
-var port = process.env.PORT || 1234;
+var ini = require('ini');
+
+var config = ini.parse(fs.readFileSync('./settings.ini', 'utf-8'));
+console.log(config.redisMaster)
+var subscriber = redis.createClient(6379,config.redisMaster.redisIP)
+var publisher  = redis.createClient(6379,config.redisMaster.redisIP);
+//var io = require('../..')(server);
+var io = require('socket.io')(server);
+var port = process.env.PORT || 7001;
+
+require('date-util');
+
+subscriber.on("message", function(channel, message) {
+  //console.log("Message '" + message + "' on channel '" + channel + "' arrived!")
+
+
+  if( channel == "Verify" ) IdentifyCallback(message)
+  else if( channel == "BACSApiResponse" ) ApiCallback(message)
+
+});
+// from core (callback)
+subscriber.subscribe("Verify");
+subscriber.subscribe("BACSApiResponse");
+
+function ApiCallback(message) {
+  var parseData = JSON.parse(message);
+
+
+  var notAcceptable = true
+  if( !parseData.hasOwnProperty('response') ) {
+    console.log("no exist response property!!")
+    return
+  }
+
+
+  if( parseData.response == "user;template;enrollment;") {
+    if( !parseData.hasOwnProperty('userid') ) notAcceptable = false
+    if( !parseData.hasOwnProperty('templates') ) notAcceptable = false
+    if( notAcceptable == false ) {
+      console.log("Json parse error!!")
+      return
+    }
+    //console.log(parseData.templates[0].image)
+    io.emit('enrollimg', "data:image/png;base64,"+ parseData.templates[0].image);
+  }
+  else if( parseData.response == "history;verify;") {
+    // "BACSApiResponse" "{\"response\":\"history;verify;\",\"date\":\"2018-07-09 20:54:27\",\"module\":52,\"userid\":\"713\",\"verify\":0,\"username\":\"Justin\"}"
+    // "BACSApiResponse" "{\"response\":\"history;verify;\",\"date\":\"2018-07-09 21:00:03\",\"module\":52,\"userid\":\"null\",\"verify\":-1,\"username\":\"fail\"}"
+    if( parseData.userid == "null" || parseData.userid == null) {
+      console.log("identify fail")
+      io.emit('identifyLog', parseData.date + " - " + "identify fail");
+      fs.readFile("/home/bacs/host/public/images/image_02.png", function(err, data){
+        io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
+      });
+    } else {
+      io.emit('identifyLog', parseData.date + " - " + parseData.username + " (" + parseData.userid + ")")
+      fs.readFile("/home/bacs/Face/faceModule/" + parseData.userid + ".bmp", function(err, data){
+        io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
+      });
+    }
+
+  }
+
+}
+
+// function IdentifyCallback(message) {
+// 	console.log("set GUI '" + message)
+//   io.emit('identifyLog', message);
+//
+//   fs.readFile(message, function(err, data){
+//     //io.emit('imageConversionByClient', { image: true, buffer: data });
+//     io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
+//
+//
+//     // socket.broadcast.emit('new message', {
+//     //   username: socket.username,
+//     //   message: data
+//     // });
+// });
+// }
+
+function IdentifyCallback(message) {
+  var parseData = message.split(';');
+  var command = parseData[0]
+  if( command != 'result' ) {
+      //console.log('not result')
+      return
+  }
+  var module = parseData[1]
+  var id = parseData[2]
+  var name = parseData[3]
+  console.log("name : " + name);
+  //var curtime = new Date().format("yyyy-mm-dd HH:MM:ss.l");
+  var curtime = new Date().format("yyyy-mm-dd HH:MM:ss");
+  var json = {};
+  json.response = 'history;verify;'
+  json.date = curtime
+  json.module = parseInt(module)+0x33
+  if( name == 'fail') {
+    json.userid = 'null'
+    json.verify = -1
+  }else {
+    json.userid = id
+    json.verify = 0
+  }
+ json.username = name
+
+  publisher.publish("BACSApiResponse", JSON.stringify(json));
+}
+
 
 server.listen(port, () => {
   console.log('Server listening at port %d', port);
@@ -26,6 +133,20 @@ io.on('connection', (socket) => {
   socket.on('faceenroll', function(msg){
 
     console.log('faceenroll: ' + msg);
+
+    var parseData = msg.split(';');
+    //cmdtype
+    var id = parseData[0]
+    var name = parseData[1]
+    console.log(id)
+    console.log(name)
+    var json = {};
+    json.request = "user;account;add;"
+    json.userid = id
+    json.username = name
+    publisher.publish("BACSApiRequest", JSON.stringify(json));
+
+    publisher.publish("Enroll", "1;" + id + ";" + ";;;");
   });
   socket.on('facecancel', function(msg){
 
@@ -34,6 +155,7 @@ io.on('connection', (socket) => {
 
   socket.on('fingerenroll', function(msg){
 
+    publisher.publish("Enroll", "0;" + msg + ";" + ";;;");
     console.log('fingerenroll: ' + msg);
   });
   socket.on('fingercancel', function(msg){
@@ -99,30 +221,3 @@ io.on('connection', (socket) => {
     }
   });
 });
-
-
-subscriber.on("message", function(channel, message) {
-  console.log("Message '" + message + "' on channel '" + channel + "' arrived!")
-
-
-  if( channel == "Verify" ) IdentifyCallback(message)
-
-});
-// from core (callback)
-subscriber.subscribe("Verify");
-
-function IdentifyCallback(message) {
-	console.log("set GUI '" + message)
-  io.emit('identifyLog', message);
-
-  fs.readFile(message, function(err, data){
-    //io.emit('imageConversionByClient', { image: true, buffer: data });
-    io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
-
-
-    // socket.broadcast.emit('new message', {
-    //   username: socket.username,
-    //   message: data
-    // });
-});
-}
