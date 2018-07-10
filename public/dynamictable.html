@@ -1,0 +1,301 @@
+<!doctype html>
+
+<html lang="ko">
+
+  <head>
+
+    <meta charset="UTF-8">
+
+    <title>jquery 연습</title>
+
+  </head>
+
+
+
+<script>
+
+
+
+/*
+
+	function button1(){
+
+		var btn1=document.getElementById("btn1");
+
+		var btn3=document.getElementById("btn3");
+
+		var text=document.getElementById("text");
+
+		if(btn1.value==text.value){
+
+			btn1.style.color="blue";
+
+			text.value=btn3.value;
+
+		}
+
+		else {
+
+			btn1.style.color="red";
+
+			text.value=btn1.value;
+
+		}
+
+	}
+
+
+
+	function button2(){
+
+
+
+		var btn2=document.getElementById("btn2");
+
+		var btn3=document.getElementById("btn3");
+
+		var text=document.getElementById("text");
+
+		if(btn2.value==text.value){
+
+			btn2.style.color="blue";
+
+			text.value=btn3.value;
+
+		}
+
+		else {
+
+			btn2.style.color="red";
+
+			text.value=btn2.value;
+
+		}
+
+	}
+
+*/
+
+
+
+	function button_this(btn){
+
+		var btn3=document.getElementById("btn3");
+
+		var text=document.getElementById("text");
+
+		if(btn.value==text.value){
+
+			btn.style.color="blue";
+
+			text.value=btn3.value;
+
+		}
+
+		else {
+
+			btn.style.color="red";
+
+			text.value=btn.value;
+
+		}
+
+	}
+
+
+
+	function button3(){
+
+
+
+		var btn3=document.getElementById("btn3");
+
+
+
+
+
+		if(btn3.value=="HI"){
+
+			btn3.value="BYE";
+
+		}else{
+
+			btn3.value="HI";
+
+		}
+
+	}
+
+
+
+
+
+	function allchk(chk){
+
+
+
+		var listchk=document.getElementsByName("listchk");
+
+		if(chk.checked){
+
+			for(var i=0;i<listchk.length;i++){
+
+				listchk[i].checked="true";
+
+			}
+
+		}else{
+
+			for(var i=0;i<listchk.length;i++){
+
+				listchk[i].checked="";
+
+
+
+			}
+
+
+
+		}
+
+
+
+	}
+
+
+
+	var k=1;
+
+
+
+	function tr_insert(){
+
+
+
+
+
+		var table=document.getElementById("table");
+
+		var tr = table.insertRow(-1);
+
+
+
+		var cell1 = tr.insertCell(0);
+
+	    cell1.innerHTML = 'insertRow ' + k ;
+
+
+
+		var cell2=tr.insertCell(1);
+
+		cell2.innerHTML='<input type="button" value="삭제" onclick="tr_delete(this)"/>';
+
+		k++;
+
+
+
+	}
+
+	function tr_delete(row){
+
+
+
+		var tr=row.parentNode.parentNode;
+
+		var table=tr.parentNode;
+
+
+
+		table.deleteRow(tr.rowIndex);
+
+	}
+
+
+
+
+
+
+
+    </script>
+
+  <body>
+
+
+
+  	<input type="text" value="0" id=text>
+
+  	<input type="button" id="btn1" value="Button 1" style="color:blue" onClick="button_this(this);">
+
+  	<input type="button" id="btn2" value="Button 2" style="color:blue" onClick="button_this(this);">
+
+  	<input type="button" id="btn3" value="HI" onClick="button3();">
+
+  	<table border=1 width=50% style="display:none">
+
+  		<tr class="row">
+
+			<td class="ir">Insert Row</td>
+
+			<td width="46" class="r"><input type="button" value="삭제" ></td>
+
+  		</tr>
+
+  	</table>
+
+  	<br><br>
+
+  	<table border=1 width=50%  id="table" >
+
+  		<tr class="row0" id="tr">
+
+			<td>동적테이블</td>
+
+			<td width="46"><input type="button" value="추가" class="insert" onClick="tr_insert()"></td>
+
+  		</tr>
+
+  	</table>
+
+
+
+  	<br><br>
+
+  	<table>
+
+	  	<tr>
+
+			<td><input type="checkbox" name="allchk" id="allchk" onchange="allchk(this);"/></td>
+
+		</tr>
+
+
+
+		<tr>
+
+			<td align="center"><input name="listchk" type="checkbox" class="chkbox" id="listchk"></td>
+
+		</tr>
+
+		<tr>
+
+			<td align="center"><input name="listchk" type="checkbox" class="chkbox" id="listchk"></td>
+
+		</tr>
+
+		<tr>
+
+			<td align="center"><input name="listchk" type="checkbox" class="chkbox" id="listchk"></td>
+
+		</tr>
+
+  	</table>
+
+
+
+
+
+
+
+  </body>
+
+</html>

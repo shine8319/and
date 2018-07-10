@@ -6,8 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href='w3.css'>
-  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href='tabs.css'>
   <link rel="stylesheet" href="icono.min.css">
+  <link rel="stylesheet" href="bootstrap.min.css">
   <style>
   body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
   .w3-row-padding img {margin-bottom: 12px}
@@ -26,6 +27,13 @@
     border-radius: 50%;
   }
   </style>
+
+  <style>
+  table {
+    width: 100%;
+    /*border: 1px solid #444444;*/
+  }
+</style>
 
 </head>
 <!-- <body>
@@ -109,50 +117,203 @@
 
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="enroll">
     <h2 class="w3-text-light-grey">Face</h2>
-    <hr style="width:200px" class="w3-opacity">
+    <hr style="width:300px" class="w3-opacity">
 
+    <!-- <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'Enroll')">Enroll</button>
+      <button class="tablinks" onclick="openTab(event, 'Account')">Account</button>
+    </div> -->
     <!-- <p>Lets get in touch. Send me a message:</p> -->
 
     <!-- <form action="/action_page.php" target="_blank"> -->
+    <!-- <div id="Enroll" class="tabcontent"> -->
+      <form id="faceenroll" action="">
+        <p><img id="enrollimg" width="100%"></p>
+        <p><input id="faceid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
+        <!-- <p><input id="facename" class="w3-input w3-padding-16" type="text" placeholder="Name" required name="Name"></p> -->
+        <p>
+          <button class="w3-button w3-light-grey w3-padding-large" type="submit">
+            <i class="fa fa-paper-plane"></i> Enroll
+          </button>
+          <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="facedelete()">
+            <i class="fa fa-paper-plane"></i> Delete
+          </button>
 
-    <form id="faceenroll" action="">
-      <p><img id="enrollimg" width="100%"></p>
-      <p><input id="faceid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
-      <p><input id="facename" class="w3-input w3-padding-16" type="text" placeholder="Name" required name="Name"></p>
-      <p>
-        <button class="w3-button w3-light-grey w3-padding-large" type="submit">
-          <i class="fa fa-paper-plane"></i> Enroll
-        </button>
-        <button class="w3-button w3-light-grey w3-padding-large" type="button">
-          <i class="fa fa-paper-plane"></i> Cancel
-        </button>
-      </p>
-    </form>
+        </p>
+      </form>
+    <!-- </div> -->
+
+    <!-- <div id="Account" class="tabcontent"> -->
+
+    <!-- </div> -->
+  </div>
+  <script>
+    function openTab(evt, cityName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+    }
+  </script>
+  <script>
+     var tablearea;
+     var table;
+     var thead;
+     var tr;
+     var th;
+
+     var data = ["ID", "Name", "Delete"] //Added because it was missing... no idea what the original should have been
+
+     tablearea = document.getElementById('ShowDataID');
+     table = document.createElement('table');
+     thead = document.createElement('thead');
+     tr = document.createElement('tr');
+
+     for (var i = 0; i < data.length; i++) {
+         var headerTxt = document.createTextNode(data[i]);
+         th = document.createElement('th');
+         th.appendChild(headerTxt);
+         tr.appendChild(th);
+         thead.appendChild(tr);
+     }
+
+     table.appendChild(thead);
+
+    //  for (var i = 1; i < 4; i++) {
+    //      tr = document.createElement('tr');
+    //      tr.appendChild(document.createElement('td'));
+    //      tr.appendChild(document.createElement('td'));
+    //      tr.appendChild(document.createElement('td')); //Added for checkbox
+     //
+    //      var checkbox = document.createElement("INPUT"); //Added for checkbox
+    //      checkbox.type = "checkbox"; //Added for checkbox
+     //
+    //      tr.cells[0].appendChild(document.createTextNode('234'));
+    //      tr.cells[1].appendChild(document.createTextNode('McDowell'));
+    //      tr.cells[2].appendChild(checkbox); //Added for checkbox
+     //
+    //      table.appendChild(tr);
+    //  }
+     tablearea.appendChild(table);
+  </script>
+  <script>
+    function search_row() {
+      var my_tbody = document.getElementById('faceaccount-tbody');
+
+      // var row = my_tbody.insertRow(0); // 상단에 추가
+      var row = my_tbody.insertRow( my_tbody.rows.length ); // 하단에 추가
+      var cell1 = row.insertCell(0);
+      var cell2 = row.insertCell(1);
+      var cell3 = row.insertCell(2);
+      cell1.innerHTML = true;
+      cell2.innerHTML = 1234;
+      cell3.innerHTML = "Justin";
+    }
+
+    function delete_row() {
+      var my_tbody = document.getElementById('faceaccount-tbody');
+      if (my_tbody.rows.length < 1) return;
+      // my_tbody.deleteRow(0); // 상단부터 삭제
+      my_tbody.deleteRow( my_tbody.rows.length-1 ); // 하단부터 삭제
+    }
+
+
+
+    function facedelete() {
+      socket.emit('facedelete', $('#faceid').val());
+      $('#faceid').val('');
+    }
+    function fingerdelete() {
+      socket.emit('fingerdelete', $('#fingerid').val());
+      $('#fingerid').val('');
+    }
+    function accountsearch() {
+      socket.emit('accountsearch', "user_data");
+    }
+    function accountadd() {
+      socket.emit('accountadd', $('#userid').val() + ";" + $('#username').val() + ";");
+
+      $('#userid').val('');
+      $('#username').val('');
+    }
+    function accountdelete() {
+      socket.emit('accountdelete', $('#userid').val());
+      $('#userid').val('');
+    }
+
+  </script>
 
   <div class="w3-content w3-justify w3-text-grey w3-padding-64">
     <h2 class="w3-text-light-grey">Finger</h2>
-    <hr style="width:200px" class="w3-opacity">
+    <hr style="width:300px" class="w3-opacity">
 
     <!-- <p>Lets get in touch. Send me a message:</p> -->
 
     <!-- <form action="/action_page.php" target="_blank"> -->
 
     <form id="fingerenroll" action="">
+
+      <!-- <p><img id="fingerimg" width="100%"></p> -->
+      <p><input id="fingermsg" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></p>
       <p><input id="fingerid" class="w3-input w3-padding-16" type="text" placeholder="Id" required name="Id"></p>
       <p>
         <button class="w3-button w3-light-grey w3-padding-large" type="submit">
           <i class="fa fa-paper-plane"></i> Enroll
         </button>
-        <button class="w3-button w3-light-grey w3-padding-large" type="button">
-          <i class="fa fa-paper-plane"></i> Cancel
+        <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="fingerdelete()">
+          <i class="fa fa-paper-plane"></i> Delete
         </button>
       </p>
     </form>
 
 
+
+
+    <div class="w3-content w3-justify w3-text-grey w3-padding-64">
+      <h2 class="w3-text-light-grey">Account</h2>
+      <hr style="width:300px" class="w3-opacity">
+
+      <form id="accountsearch" action="">
+        <p><input id="userid" class="w3-input w3-padding-16" type="text" placeholder="userid" required name="userid"></p>
+        <p><input id="username" class="w3-input w3-padding-16" type="text" placeholder="username" required name="username"></p>
+        <p>
+          <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="accountsearch()">
+            <i class="fa fa-paper-plane"></i> Search
+          </button>
+          <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="accountadd()">
+            <i class="fa fa-paper-plane"></i> Add
+          </button>
+          <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="accountdelete()">
+            <i class="fa fa-paper-plane"></i> Delete
+          </button>
+          <!-- <button class="w3-button w3-light-grey w3-padding-large" type="button">
+            <i class="fa fa-paper-plane"></i> Cancel
+          </button> -->
+        </p>
+      </form>
+
+      <div id="ShowDataID"></div>
+
+    </div>
+
+
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="identify">
     <h2 class="w3-text-light-grey">Identify</h2>
-    <hr style="width:200px" class="w3-opacity">
+    <hr style="width:300px" class="w3-opacity">
 
     <!-- Grid for photos -->
     <div class="w3-row-padding" style="margin:0 -16px">
@@ -162,7 +323,9 @@
         <!-- <ul id="messages"></ul> -->
         <p><input id="messages2" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></p>
       </div>
-
+      <!-- <div class="alert alert-success">
+        <label id="messages3" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></label>
+      </div> -->
 
     <!-- End photo grid -->
     </div>
@@ -176,7 +339,7 @@
   <!-- Contact Section -->
   <div class="w3-padding-64 w3-content w3-text-grey" id="contact">
     <h2 class="w3-text-light-grey">Contact</h2>
-    <hr style="width:200px" class="w3-opacity">
+    <hr style="width:300px" class="w3-opacity">
 
     <div class="w3-section">
       <!-- <p><i class="fa fa-map-marker fa-fw w3-text-white w3-xxlarge w3-margin-right"></i> Seoul, Republic of Korea</p>
@@ -231,9 +394,10 @@ function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;
     // });
 
     $('#faceenroll').submit(function(){
-      socket.emit('faceenroll', $('#faceid').val() + ";" + $('#facename').val() + ";");
+      // socket.emit('faceenroll', $('#faceid').val() + ";" + $('#facename').val() + ";");
+      socket.emit('faceenroll', $('#faceid').val());
       $('#faceid').val('');
-      $('#facename').val('');
+      // $('#facename').val('');
       return false;
     });
 
@@ -243,6 +407,10 @@ function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;
       return false;
     });
 
+    $('#accountsearch').submit(function(){
+      socket.emit('accountsearch', "user_data");
+      return false;
+    });
     // socket.on('chat message', function(msg){
     //   $('#messages').append($('<li>').text(msg));
     // });
@@ -253,16 +421,117 @@ function b64(e){var t="";var n=new Uint8Array(e);var r=n.byteLength;for(var i=0;
     socket.on('imageConversionByServer', function(data) {
       $("#img2").attr("src",data);
     });
+    socket.on('fingerenroll', function(data) {
+      //$("#fingerimg").attr("src",data);
+      $('#fingermsg').val(data);
+
+    });
+
     socket.on('enrollimg', function(data) {
       $("#enrollimg").attr("src",data);
     });
     socket.on('identifyLog', function(data) {
       $('#messages2').val(data);
+      $('#messages3').val(data);
+    });
+    socket.on('accountsearch', function(message) {
+      var tablearea;
+      var table;
+      var thead;
+      var tr;
+      var th;
+
+      // var data = ["ID", "Name", "Delete"] //Added because it was missing... no idea what the original should have been
+      var data = ["ID", "Name"]
+      tablearea = document.getElementById('ShowDataID');
+      table = document.createElement('table');
+      thead = document.createElement('thead');
+      tr = document.createElement('tr');
+
+      tablearea.innerHTML = '';
+
+
+      for (var i = 0; i < data.length; i++) {
+          var headerTxt = document.createTextNode(data[i]);
+          th = document.createElement('th');
+          th.appendChild(headerTxt);
+          tr.appendChild(th);
+          thead.appendChild(tr);
+      }
+
+      table.appendChild(thead);
+
+      for (var i = 0; i < message.length; i++) {
+          tr = document.createElement('tr');
+          tr.appendChild(document.createElement('td'));
+          tr.appendChild(document.createElement('td'));
+          // tr.appendChild(document.createElement('td')); //Added for checkbox
+          //
+          // var checkbox = document.createElement("INPUT"); //Added for checkbox
+          // checkbox.type = "checkbox"; //Added for checkbox
+
+          tr.cells[0].appendChild(document.createTextNode(message[i].userid));
+          tr.cells[1].appendChild(document.createTextNode(message[i].username));
+          // tr.cells[2].appendChild(checkbox); //Added for checkbox
+
+          table.appendChild(tr);
+      }
+      tablearea.appendChild(table);
     });
   });
 </script>
 <script>
   var socket = io();
 </script>
+<script>
+    $(document).ready(function(){
+        var tbl = $("#checkboxTestTbl");
+
+        // 테이블 헤더에 있는 checkbox 클릭시
+        $(":checkbox:first", tbl).click(function(){
+            // 클릭한 체크박스가 체크상태인지 체크해제상태인지 판단
+            if( $(this).is(":checked") ){
+                $(":checkbox", tbl).attr("checked", "checked");
+            }
+            else{
+                $(":checkbox", tbl).removeAttr("checked");
+            }
+
+            // 모든 체크박스에 change 이벤트 발생시키기
+            $(":checkbox", tbl).trigger("change");
+        });
+
+        // 헤더에 있는 체크박스외 다른 체크박스 클릭시
+        $(":checkbox:not(:first)", tbl).click(function(){
+            var allCnt = $(":checkbox:not(:first)", tbl).length;
+            var checkedCnt = $(":checkbox:not(:first)", tbl).filter(":checked").length;
+
+            // 전체 체크박스 갯수와 현재 체크된 체크박스 갯수를 비교해서 헤더에 있는 체크박스 체크할지 말지 판단
+            if( allCnt==checkedCnt ){
+                $(":checkbox:first", tbl).attr("checked", "checked");
+            }
+            else{
+                $(":checkbox:first", tbl).removeAttr("checked");
+            }
+        }).change(function(){
+            if( $(this).is(":checked") ){
+                // 체크박스의 부모 > 부모 니까 tr 이 되고 tr 에 selected 라는 class 를 추가한다.
+                $(this).parent().parent().addClass("selected");
+            }
+            else{
+                $(this).parent().parent().removeClass("selected");
+            }
+        });
+    });
+</script>
+
+<style>
+    #checkboxTestTbl {border-collapse: collapse;}
+    #checkboxTestTbl td, #checkboxTestTbl th{padding:20px;}
+    #checkboxTestTbl th{background-color: #ccc;}
+
+    #checkboxTestTbl tr.selected{background-color: navy;color: #fff; font-weight: bold;}
+</style>
+
 </body>
 </html>

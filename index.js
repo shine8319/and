@@ -1,11 +1,13 @@
 // Setup basic express server
 var express = require('express');
+// var jjport = require('./routes/jjboard.js')
 var app = express();
 var path = require('path');
 var server = require('http').createServer(app);
 var fs = require('fs');
 var redis = require("redis")
 var ini = require('ini');
+
 
 var config = ini.parse(fs.readFileSync('./settings.ini', 'utf-8'));
 console.log(config.redisMaster)
@@ -17,17 +19,27 @@ var port = process.env.PORT || 7001;
 
 require('date-util');
 
+
+
+
 subscriber.on("message", function(channel, message) {
   //console.log("Message '" + message + "' on channel '" + channel + "' arrived!")
 
 
   if( channel == "Verify" ) IdentifyCallback(message)
   else if( channel == "BACSApiResponse" ) ApiCallback(message)
+  else if( channel == "ttyfingerenroll" ) FingerEnrollCallback(message)
+  else if( channel == "ttyfingerdelete" ) FingerEnrollCallback(message)
+  else if( channel == "ttyfingerguide" ) FingerGuideCallback(message)
 
 });
 // from core (callback)
 subscriber.subscribe("Verify");
 subscriber.subscribe("BACSApiResponse");
+
+subscriber.subscribe("ttyfingerguide");
+subscriber.subscribe("ttyfingerenroll");
+subscriber.subscribe("ttyfingerdelete");
 
 function ApiCallback(message) {
   var parseData = JSON.parse(message);
@@ -67,6 +79,10 @@ function ApiCallback(message) {
     }
 
   }
+  else if( parseData.response == "user;account;search;") {
+    io.emit('accountsearch', parseData.userids)
+    console.log(parseData.userids)
+  }
 
 }
 
@@ -85,6 +101,35 @@ function ApiCallback(message) {
 //     // });
 // });
 // }
+function FingerGuideCallback(message) {
+  // var parseData = message.split(';');
+  // var msg = parseData[0]
+
+  console.log(message)
+
+  io.emit('fingerenroll',message)
+
+}
+
+
+
+function FingerEnrollCallback(message) {
+  var parseData = message.split(';');
+  var success = parseData[0]
+  var data = parseData[1]
+
+  if( success == 1 ) {
+    io.emit('fingerenroll','Success')
+    // fs.readFile("/home/bacs/host/img/image_bio_finger_s.png", function(err, data){
+    //   io.emit('fingerenroll', "data:image/png;base64,"+ data.toString("base64"));
+    // });
+  } else {
+    io.emit('fingerenroll','Fail')
+    // fs.readFile("/home/bacs/host/img/image_bio_finger_f.png", function(err, data){
+    //   io.emit('fingerenroll', "data:image/png;base64,"+ data.toString("base64"));
+    // });
+  }
+}
 
 function IdentifyCallback(message) {
   var parseData = message.split(';');
@@ -134,8 +179,54 @@ io.on('connection', (socket) => {
 
     console.log('faceenroll: ' + msg);
 
+    // var parseData = msg.split(';');
+    // //cmdtype
+    // var id = parseData[0]
+    // var name = parseData[1]
+    // console.log(id)
+    // console.log(name)
+    // var json = {};
+    // json.request = "user;account;add;"
+    // json.userid = id
+    // json.username = name
+    // publisher.publish("BACSApiRequest", JSON.stringify(json));
+
+    publisher.publish("Enroll", "1;" + msg + ";" + ";;;");
+  });
+  socket.on('facedelete', function(msg){
+
+    console.log('facedelete: ' + msg);
+
+    var json = {};
+    var facemodule = [];
+    facemodule[0] = 52
+    json.request = "user;template;delete;"
+    json.userid = msg
+    json.module = facemodule
+    publisher.publish("BACSApiRequest", JSON.stringify(json));
+
+  });
+
+  socket.on('fingerenroll', function(msg){
+
+    publisher.publish("ttyfinger", "enroll;" + msg + ";");
+    console.log('fingerenroll: ' + msg);
+  });
+  socket.on('fingerdelete', function(msg){
+    publisher.publish("ttyfinger", "delete;" + msg + ";");
+    console.log('fingerdelete: ' + msg);
+  });
+
+
+  socket.on('accountsearch', function(msg){
+    //console.log('accountsearch: ' + msg);
+    var json = {};
+    json.request = "user;account;search;"
+    publisher.publish("BACSApiRequest", JSON.stringify(json));
+  });
+  socket.on('accountadd', function(msg){
     var parseData = msg.split(';');
-    //cmdtype
+
     var id = parseData[0]
     var name = parseData[1]
     console.log(id)
@@ -145,22 +236,16 @@ io.on('connection', (socket) => {
     json.userid = id
     json.username = name
     publisher.publish("BACSApiRequest", JSON.stringify(json));
-
-    publisher.publish("Enroll", "1;" + id + ";" + ";;;");
   });
-  socket.on('facecancel', function(msg){
+  socket.on('accountdelete', function(msg){
+    // var parseData = msg.split(';');
 
-    console.log('facecancel: ' + msg);
-  });
+    console.log(msg)
 
-  socket.on('fingerenroll', function(msg){
-
-    publisher.publish("Enroll", "0;" + msg + ";" + ";;;");
-    console.log('fingerenroll: ' + msg);
-  });
-  socket.on('fingercancel', function(msg){
-
-    console.log('fingercancel: ' + msg);
+    var json = {};
+    json.request = "user;account;delete;"
+    json.userid = msg
+    publisher.publish("BACSApiRequest", JSON.stringify(json));
   });
   // when the client emits 'new message', this listens and executes
   socket.on('new message', (data) => {
