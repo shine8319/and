@@ -227,6 +227,9 @@
 
         <!-- <ul id="messages"></ul> -->
         <p><input id="messages2" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></p>
+        <button class="w3-button w3-light-grey w3-padding-large" type="button" onclick="restartidentify()">
+          <i class="fa fa-paper-plane"></i> Identify
+        </button>
       <!-- </div> -->
       <!-- <div class="alert alert-success">
         <label id="messages3" class="w3-input w3-padding-16" type="text" placeholder="Please scan your biometrics"></label>
@@ -396,6 +399,12 @@
     socket.emit('accountdelete', $('#userid').val());
     $('#userid').val('');
   }
+  function restartidentify() {
+    socket.emit('restartidentify', "restart");
+  }
+
+
+
 
 </script>
 

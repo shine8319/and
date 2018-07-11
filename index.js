@@ -8,7 +8,7 @@ var fs = require('fs');
 var redis = require("redis")
 var ini = require('ini');
 var btoa = require('btoa');
-
+var exec = require( "child_process" ).exec;
 var config = ini.parse(fs.readFileSync('./settings.ini', 'utf-8'));
 console.log(config.redisMaster)
 var subscriber = redis.createClient(6379,config.redisMaster.redisIP)
@@ -355,6 +355,26 @@ io.on('connection', (socket) => {
     json.username = name
     publisher.publish("BACSApiRequest", JSON.stringify(json));
   });
+
+  socket.on('restartidentify', function(msg){
+    exec("sudo killall BACSModule", function(error, stdout, stderr) {
+        if(error !== null) {
+            console.log("getLoad : " + error);
+        }
+    });
+    exec("sudo killall ttyFinger", function(error, stdout, stderr) {
+        if(error !== null) {
+            console.log("getLoad : " + error);
+        }
+    });
+    exec("sudo killall nodejs", function(error, stdout, stderr) {
+        if(error !== null) {
+            console.log("getLoad : " + error);
+        }
+    });
+  });
+
+
   socket.on('accountdelete', function(msg){
     // var parseData = msg.split(';');
 
