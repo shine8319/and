@@ -7,7 +7,7 @@ var server = require('http').createServer(app);
 var fs = require('fs');
 var redis = require("redis")
 var ini = require('ini');
-
+var btoa = require('btoa');
 
 var config = ini.parse(fs.readFileSync('./settings.ini', 'utf-8'));
 console.log(config.redisMaster)
@@ -17,6 +17,7 @@ var publisher  = redis.createClient(6379,config.redisMaster.redisIP);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 7001;
 
+var fingerverifystart = false;
 require('date-util');
 
 
@@ -31,6 +32,7 @@ subscriber.on("message", function(channel, message) {
   else if( channel == "ttyfingerenroll" ) FingerEnrollCallback(message)
   else if( channel == "ttyfingerdelete" ) FingerEnrollCallback(message)
   else if( channel == "ttyfingerguide" ) FingerGuideCallback(message)
+  else if( channel == "BACSModule" ) CardCallback(message)
 
 });
 // from core (callback)
@@ -40,6 +42,18 @@ subscriber.subscribe("BACSApiResponse");
 subscriber.subscribe("ttyfingerguide");
 subscriber.subscribe("ttyfingerenroll");
 subscriber.subscribe("ttyfingerdelete");
+
+subscriber.subscribe("BACSModule");
+
+
+
+// function intervalFunc() {
+//   //console.log('finger identify');
+//   publisher.publish("ttyfinger", "verify");
+// }
+//
+// setInterval(intervalFunc, 1000);
+
 
 function ApiCallback(message) {
   var parseData = JSON.parse(message);
@@ -65,14 +79,21 @@ function ApiCallback(message) {
   else if( parseData.response == "history;verify;") {
     // "BACSApiResponse" "{\"response\":\"history;verify;\",\"date\":\"2018-07-09 20:54:27\",\"module\":52,\"userid\":\"713\",\"verify\":0,\"username\":\"Justin\"}"
     // "BACSApiResponse" "{\"response\":\"history;verify;\",\"date\":\"2018-07-09 21:00:03\",\"module\":52,\"userid\":\"null\",\"verify\":-1,\"username\":\"fail\"}"
+    var strModule = "null"
+    if( parseData.module == "51" || parseData.module == "54" ) strModule = "Finger"
+    else if( parseData.module == '52' ) strModule = "Face"
+    else if( parseData.module == '55' ) strModule = "Card"
+
     if( parseData.userid == "null" || parseData.userid == null) {
       console.log("identify fail")
-      io.emit('identifyLog', parseData.date + " - " + "identify fail");
+
+      io.emit('identifyLog', parseData.date + " - " + "identify fail" + " (" + strModule + ")")
       fs.readFile("/home/bacs/host/public/images/image_02.png", function(err, data){
         io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
       });
     } else {
-      io.emit('identifyLog', parseData.date + " - " + parseData.username + " (" + parseData.userid + ")")
+      //io.emit('identifyLog', parseData.date + " - " + parseData.username + " (" + parseData.userid + ")")
+      io.emit('identifyLog', parseData.date + " - " + "[" + parseData.userid + "]" + parseData.username + " (" + strModule + ")")
       fs.readFile("/home/bacs/Face/faceModule/" + parseData.userid + ".bmp", function(err, data){
         io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
       });
@@ -109,8 +130,70 @@ function FingerGuideCallback(message) {
 
   io.emit('fingerenroll',message)
 
+  if( message == "Sensor_fail"){
+    subscriber.subscribe("ttyfingerguide");
+    subscriber.subscribe("ttyfingerenroll");
+    subscriber.subscribe("ttyfingerdelete");
+  }
+
 }
 
+
+
+function CardCallback(message) {
+
+  console.log(message)
+
+  var parseData = message.split(';');
+  var command = parseData[0]
+  if( command != 'verify' ) {
+      //console.log('not result')
+      return
+  }
+  var success = parseData[1]
+  var moduletype = parseData[2]
+
+  // face detect
+  if( moduletype == '1' ) {
+    if( fingerverifystart == false ) {
+      fingerverifystart = true
+
+       publisher.publish("ttyfinger", "verify");
+    }
+  }
+
+  if( moduletype == '0' ) {
+
+      console.log("finger verify result")
+    if( fingerverifystart == true ) {
+      fingerverifystart = false
+    }
+    //var curtime = new Date().format("yyyymmddHHMMss.l");
+    var curtime = new Date().format("yyyy-mm-dd HH:MM:ss");
+    if( success == '1' ) {
+
+      //"PUBLISH" "Verify" "result;3;0;fail;"
+      publisher.publish("Verify", "result;3;0;fail;");
+      io.emit('identifyLog', curtime + " - " + "identify fail(fingerprint)");
+      fs.readFile("/home/bacs/host/public/images/image_02.png", function(err, data){
+        io.emit('imageConversionByServer', "data:image/png;base64,"+ data.toString("base64"));
+      });
+    }
+
+  }
+
+
+
+  if( success != '0' || moduletype != '4' ) return
+
+  var card = parseData[3]
+
+  io.emit('carddata',card)
+
+
+  console.log(card)
+
+}
 
 
 function FingerEnrollCallback(message) {
@@ -158,6 +241,8 @@ function IdentifyCallback(message) {
  json.username = name
 
   publisher.publish("BACSApiResponse", JSON.stringify(json));
+
+  if( module == '4' && json.verify == 0) publisher.publish("Verify", "photo;4;" + id + ";" + name + ";");
 }
 
 
@@ -215,6 +300,39 @@ io.on('connection', (socket) => {
   socket.on('fingerdelete', function(msg){
     publisher.publish("ttyfinger", "delete;" + msg + ";");
     console.log('fingerdelete: ' + msg);
+  });
+  socket.on('cardenroll', function(msg){
+    var parseData = msg.split(';');
+
+    var id = parseData[0]
+    var csn = parseData[1]
+    console.log(id)
+    console.log(csn)
+    var json = {};
+    var moduletemplate = [];
+    //moduletemplate[0] = btoa(csn)
+
+    var b64string = csn
+    // var buf = new Buffer(b64string, 'base64').toString("ascii"); // Ta-da
+    var buf = new Buffer(b64string, 'ascii').toString("base64"); // Ta-da
+    // if (typeof Buffer.from === "function") {
+    //     // Node 5.10+
+    //     buf = Buffer.from(b64string, 'base64'); // Ta-da
+    // } else {
+    //     // older Node versions
+    //     buf = new Buffer(b64string, 'base64'); // Ta-da
+    // }
+
+    moduletemplate[0] = buf
+    console.log(moduletemplate[0])
+    var moduletype = [];
+    moduletype[0] = 55
+    json.request = "user;template;add;"
+    json.userid = id
+    json.module = moduletype
+    json.template = moduletemplate
+    publisher.publish("BACSApiRequest", JSON.stringify(json));
+    console.log('cardenroll: ' + msg);
   });
 
 
